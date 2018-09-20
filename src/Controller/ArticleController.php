@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-use Symfony\Component\Cache\Adapter\AdapterInterface; 
-use Michelf\MarkdownInterface;
+use App\Service\MarkdownHelper;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +23,7 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}", name="article_show")
      */
-    public function show($slug, MarkdownInterface $markdown, AdapterInterface $cache)
+    public function show($slug, MarkdownHelper $markdownHelper)
     {
         $comments = [
             'I ate a normal rock once. It did NOT taste like bacon!',
@@ -45,16 +44,8 @@ buffalo incididunt in filet mignon strip steak pork belly aliquip capicola offic
 adipisicing. Pig hamburger pork belly enim. Do porchetta minim capicola irure pancetta chuck fugiat.
 EOF;
 
-        // Create cache item object in memory to handle cache item
-        $item = $cache->getItem('markdown_'.md5($articleContent));
-
-        if (!$item->isHit()) { // If the key is not already cached
-            // Put the item into cache
-            $item->set($markdown->transform($articleContent));
-            $cache->save($item);
-        }        
-        // Fetch walue from the cache
-        $articleContent = $item->get();
+        // Create cache item object using our custom service
+        $articleContent = $markdownHelper->parse($articleContent);
 
         return $this->render('article/show.html.twig', [
             'title' => ucwords(str_replace('-', ' ', $slug)),
