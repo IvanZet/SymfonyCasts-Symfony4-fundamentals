@@ -13,7 +13,7 @@ use Twig\Environment;
 class ArticleController extends AbstractController
 {
     /**
-     * Currently unsused: just showing a controller with a constructor!
+     * Currently unsused: just showing a cont roller with a constructor!
      */
     private $isDebug;
     
